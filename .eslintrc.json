@@ -1,7 +1,8 @@
 {
     "env": {
         "es6": true,
-        "node": true
+        "node": true,
+        "browser": true
     },
     "extends": [
         "airbnb-base"
@@ -14,11 +15,11 @@
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    "plugins": [
-        "prettier"
-    ],
     "rules": {
-        "indent": ["error", 4],
-        "prettier/prettier": "error"
+        "indent": ["error", "tab"],
+        "no-tabs": ["error", { "allowIndentationTabs": true }],
+        "no-unused-vars": 0,
+        "quotes": ["error", "double"],
+        "no-param-reassign": [2, { "props": false }]
     }
 }
