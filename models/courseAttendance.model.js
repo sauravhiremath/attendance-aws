@@ -10,6 +10,7 @@ const courseAttendanceSchema = new mongoose.Schema({
 	course: {
 		type: String,
 		required: true,
+		index: true,
 	},
 	attendance: {
 		type: [studentAttendanceSchema],
@@ -17,4 +18,4 @@ const courseAttendanceSchema = new mongoose.Schema({
 	},
 });
 
-module.exports = courseAttendanceSchema;
+module.exports = Attendance = mongoose.model("Attendance", courseAttendanceSchema);

@@ -6,13 +6,15 @@ const verifyToken = async (req, res, next) => {
 	const jwtToken = req.cookies.jwtToken || "";
 	console.log(jwtToken);
 	try {
-		if (!jwtToken) {
+		if (jwtToken === "") {
+			console.log("IN redirect route of verifyTOken");
 			return res.redirect("/auth/login");
 		}
-		const decrypt = await jwt.verify(jwtToken, process.env.JWT_SECRET);
+		const decrypt = jwt.verify(jwtToken, process.env.JWT_SECRET);
 		req.user = {
 			username: decrypt.username,
 			domain: decrypt.domain,
+			courses: decrypt.courses,
 		};
 		next();
 	} catch (err) {

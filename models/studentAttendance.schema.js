@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 
 const studentAttendanceSchema = new mongoose.Schema({
-	regNo: {
+	username: {
 		type: String,
 		required: true,
 	},
 	attendance: {
+		type: String,
 		enum: ["present", "absent", "onDuty"],
 		required: true,
 	},

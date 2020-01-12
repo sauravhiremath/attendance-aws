@@ -5,7 +5,24 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/student.model");
 const Teacher = require("../models/teacher.model");
 
+const dotenv = require("dotenv");
 const router = express.Router();
+
+const verifyToken = async (req, res, next) => {
+	const jwtToken = req.cookies.jwtToken || "";
+	console.log(jwtToken);
+	try {
+		if (jwtToken === "") {
+			next();
+		} else {
+			res.redirect("/home");
+		}
+	} catch (err) {
+		return res.status(500).json(err.toString());
+	}
+};
+
+router.use(verifyToken);
 
 router.get("/register", async (req, res) => {
 	res.render("register");
@@ -79,7 +96,8 @@ router.post("/login", async (req, res) => {
 	const jsonResponse = {
 		success: false,
 		message: "defaultResponse",
-		redirect: "/home"
+		courses: [],
+		redirect: "/home",
 	};
 
 	const { username, domain, password } = req.body;
@@ -92,8 +110,10 @@ router.post("/login", async (req, res) => {
 
 	if (domain === "teacher") {
 		client = await Teacher.findOne({ username });
+		jsonResponse.data = client.courses;
 	} else if (domain === "student") {
 		client = await User.findOne({ username });
+		jsonResponse.data = client.registeredCourses || "";
 	} else {
 		json.message = "noDomainDefined";
 		res.json(jsonResponse);
@@ -113,9 +133,10 @@ router.post("/login", async (req, res) => {
 		const payload = {
 			domain: domain,
 			username: username,
+			courses: jsonResponse.data,
 		};
-		const tokenGen = await generateToken(res, payload);
-		if (!tokenGen) {
+		const jwtCookie = await generateToken(res, payload);
+		if (!jwtCookie) {
 			jsonResponse.success = false;
 			jsonResponse.message = "jwtSignFailed";
 		} else {
@@ -141,12 +162,13 @@ router.use("/logout", async (req, res) => {
 });
 
 const generateToken = (res, payload) => {
-	const expiration = process.env.ENVIRONMENT === "dev" ? 100 : 604800000;
+	const expiration = process.env.ENVIRONMENT === "dev" ? 1000 : 604800000;
 	const jwtToken = jwt.sign(payload, process.env.JWT_SECRET, {
 		expiresIn: process.env.ENVIRONMENT === "dev" ? "1d" : "7d",
 	});
+	
 	return res.cookie("jwtToken", jwtToken, {
-		expires: new Date(Date.now() + expiration),
+		maxAge: 1000 * 60 * 15,
 		secure: false, // set to true if your using https
 		httpOnly: true,
 	});

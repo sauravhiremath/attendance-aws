@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const bodyparser = require("body-parser");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const cookieSession = require('cookie-session');
 const morgan = require("morgan");
 const cors = require("cors");
 const path = require("path");
@@ -22,19 +23,10 @@ app.use(
 	}),
 );
 app.use(bodyparser.json());
-app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/public", express.static(path.join(__dirname, "public")));
-app.use(
-	session({
-		secret: process.env.SESSION_SECRET,
-		resave: false,
-		saveUninitialized: false,
-		cookie: {
-			maxAge: 30 * 60 * 1000,
-        },
-	}),
-);
+app.use(cookieParser());
+
 app.set("view engine", "ejs");
 
 const connect = mongoose.connect(process.env.MONGO_URI, {
@@ -48,7 +40,7 @@ if (process.env.ENVIRONMENT === "dev") app.use(cors());
 app.use("/auth", authRouter);
 app.use("/home", homeRouter);
 app.use("/", verifyToken, (req, res) => { 
-    res.redirect("/auth/login");
+    res.redirect("/home");
 });
 
 app.listen(port, () => {

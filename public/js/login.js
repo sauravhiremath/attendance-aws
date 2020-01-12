@@ -6,17 +6,16 @@ $(document).ready(function() {
 		console.log($("input#studentPassword.form-control").val());
 		$.ajax({
 			url: '/auth/login',
-            type: 'POST',
+			type: 'POST',
+			credentials: 'include',
 			data: {
 				username: $("input#studentUsername.form-control").val(),
 				password: $("input#studentPassword.form-control").val(),
 				domain: "student",
 			},
-			success: function (data) {
-				console.log(data);
-				if (data["message"] === "loginSuccess") {
-					console.log(data);
-					window.location.href = "/home"
+			success: function (response) {
+				if (response["message"] === "loginSuccess") {
+					window.location.href = response.redirect;
 				}
             },
             error: function (jqXHR, textStatus, errorThrown) {

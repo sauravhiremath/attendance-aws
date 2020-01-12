@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,33 +11,38 @@
     <link rel="stylesheet" href="/public/css/main.css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="/public/js/login.js"></script>
 </head>
+
 <body>
     <div class="container login-container">
         <div class="row">
             <div class="col-md-12 login-form-1">
-                <h3>Regsiter</h3>
+                <h1>Regsiter</h1>
                 <form>
                     <div class="form-group">
-                        <input id="studentUsername" type="text" class="form-control" placeholder="Your Username *" value="" />
+                        <input id="studentUsername" type="text" class="form-control" placeholder="Your Username *"
+                            value="" />
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control" id="studentPassword" placeholder="Your Password *" value="" />
+                        <input type="password" class="form-control" id="studentPassword" placeholder="Your Password *"
+                            value="" />
                     </div>
                     <div class="form-group">
-                        <input type="email" class="form-control" id="studentEmail" placeholder="Your E-Mail *" value="" />
+                        <input type="email" class="form-control" id="studentEmail" placeholder="Your E-Mail *"
+                            value="" />
+                    </div>
+                    <div class="form-group">
+                        <label><input type="radio" class="domain" name="optradio" value="student">Student</label><br>
+                        <label><input type="radio" class="domain" name="optradio" value="teacher">Teacher</label>
                     </div>
                     <div class="form-group">
                         <input type="submit" class="btnSubmit" id="studentLoginSubmit" value="Login">
-                    </div>
-                    <div class="form-group">
-                        <a href="#" class="ForgetPwd">Forget Password?</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </body>
+
 </html>
