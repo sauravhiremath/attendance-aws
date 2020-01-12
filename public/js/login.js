@@ -1,21 +1,27 @@
 $(document).ready(function() {
-	$("#studentLoginSubmit").click(function() {
-        console.log("clicked");
+	$('#studentLoginSubmit').on('click', function(e) {
+        e.preventDefault();
+		console.log("clicked");
+		console.log($("input#studentUsername.form-control").val());
+		console.log($("input#studentPassword.form-control").val());
 		$.ajax({
-			url: "/auth/login",
-			type: "POST",
-			dataType: "json",
+			url: '/auth/login',
+            type: 'POST',
 			data: {
-				username: $("#studentUsername").val(),
-				password: $("#studentPassword").val(),
+				username: $("input#studentUsername.form-control").val(),
+				password: $("input#studentPassword.form-control").val(),
 				domain: "student",
 			},
-			success: (data) => {
-                if(data.success == "true") {
-                    console.log(data);
-                    window.location.replace("/");
-                }
+			success: function (data) {
+				console.log(data);
+				if (data["message"] === "loginSuccess") {
+					console.log(data);
+					window.location.href = "/home"
+				}
             },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('Exception:'+ errorThrown);
+            }
 		});
 	});
 });

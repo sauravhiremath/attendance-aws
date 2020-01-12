@@ -4,11 +4,8 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/student.model");
 const Teacher = require("../models/teacher.model");
-const checkSession = require("../middlewares/checkSession");
 
 const router = express.Router();
-
-// router.use(checkSession);
 
 router.get("/register", async (req, res) => {
 	res.render("register");
@@ -81,8 +78,8 @@ router.get("/login", async (req, res) => {
 router.post("/login", async (req, res) => {
 	const jsonResponse = {
 		success: false,
-        message: "defaultResponse",
-        jwtToken: ""
+		message: "defaultResponse",
+		redirect: "/home"
 	};
 
 	const { username, domain, password } = req.body;
@@ -93,16 +90,16 @@ router.post("/login", async (req, res) => {
 
 	let client;
 
-    if(domain === "teacher") {
-        client = await Teacher.findOne({ username });
-    } else if(domain === "student") {
-        client = await User.findOne({ username });
-    } else {
-        json.message = "noDomainDefined";
-        res.json(jsonResponse);
+	if (domain === "teacher") {
+		client = await Teacher.findOne({ username });
+	} else if (domain === "student") {
+		client = await User.findOne({ username });
+	} else {
+		json.message = "noDomainDefined";
+		res.json(jsonResponse);
 
-        return;
-    }
+		return;
+	}
 
 	if (!client) {
 		jsonResponse.success = false;
@@ -113,26 +110,25 @@ router.post("/login", async (req, res) => {
 	}
 
 	if (await bcrypt.compare(password, client.password)) {
-        const payload = {
-            domain: domain,
-            username: username
-        }
-        const jwtToken = await jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 36000 });
-        if (!jwtToken) {
-            jsonResponse.success = false;
-            jsonResponse.message = "jwtSignFailed";
-        } else {
-            jsonResponse.success = true;
-            jsonResponse.message = "loginSuccess";
-            jsonResponse.jwtToken = jwtToken;
-            req.session.jwtToken = jwtToken;
-        }
+		const payload = {
+			domain: domain,
+			username: username,
+		};
+		const tokenGen = await generateToken(res, payload);
+		if (!tokenGen) {
+			jsonResponse.success = false;
+			jsonResponse.message = "jwtSignFailed";
+		} else {
+			jsonResponse.success = true;
+			jsonResponse.message = "loginSuccess";
+		}
 	} else {
 		jsonResponse.success = false;
-        jsonResponse.message = "incorrectDetails";
+		jsonResponse.message = "incorrectDetails";
 	}
 
-	res.json(jsonResponse);
+	console.log(jsonResponse);
+	res.status(200).json(jsonResponse);
 });
 
 router.use("/logout", async (req, res) => {
@@ -143,5 +139,17 @@ router.use("/logout", async (req, res) => {
 		message: "logoutSuccess",
 	});
 });
+
+const generateToken = (res, payload) => {
+	const expiration = process.env.ENVIRONMENT === "dev" ? 100 : 604800000;
+	const jwtToken = jwt.sign(payload, process.env.JWT_SECRET, {
+		expiresIn: process.env.ENVIRONMENT === "dev" ? "1d" : "7d",
+	});
+	return res.cookie("jwtToken", jwtToken, {
+		expires: new Date(Date.now() + expiration),
+		secure: false, // set to true if your using https
+		httpOnly: true,
+	});
+};
 
 module.exports = router;

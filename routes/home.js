@@ -1,10 +1,10 @@
 const express = require("express");
 
-const checkSession = require("../middlewares/checkSession");
+const verifyToken = require("../middlewares/verifyToken");
 
 const router = express.Router();
 
-router.use(checkSession);
+router.use(verifyToken);
 
 router.get("/", (req, res) => {
     res.send("hello");
