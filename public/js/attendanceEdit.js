@@ -8,8 +8,8 @@ $(document).ready(function() {
 			credentials: "include",
 			data: {
 				username: $("input#studentUsername.form-control").val(),
-                course: $("input#studentPassword.form-control").val(),
-                date: $("input#studentPassword.form-control").val()
+				course: $("input#studentPassword.form-control").val(),
+				date: $("input#studentPassword.form-control").val(),
 			},
 			success: function(response) {
 				if (response["success"] === "true") {

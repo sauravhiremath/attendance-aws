@@ -7,7 +7,7 @@ const verifyToken = async (req, res, next) => {
 	console.log(jwtToken);
 	try {
 		if (jwtToken === "") {
-			console.log("IN redirect route of verifyTOken");
+			console.log("IN redirect route of verifyToken");
 			return res.redirect("/auth/login");
 		}
 		const decrypt = jwt.verify(jwtToken, process.env.JWT_SECRET);

@@ -10,35 +10,34 @@ const router = express.Router();
 
 router.use(verifyToken);
 
-router.get("/submit", async(req, res) => {
-    console.log("entered submuit");
-    const jsonResponse = {
+router.get("/submit", async (req, res) => {
+	console.log("entered submit");
+	const jsonResponse = {
 		success: false,
 		message: "defaultResponse",
 	};
 
-    const { course, date } = req.query;
-    console.log(req.query);
-    const username = req.user.username;
+	const { course, date } = req.query;
+	console.log(req.query);
+	const username = req.user.username;
 
-    if(!course || !date || !username) {
-        jsonResponse.message = "missingDetails",
-        res.json(jsonResponse);
+	if (!course || !date || !username) {
+		(jsonResponse.message = "missingDetails"), res.json(jsonResponse);
 
-        return;
-    }
+		return;
+	}
 
-    const studentsList = await Student.find({ course });
+	const studentsList = await Student.find({ course });
 
-    console.log(studentsList);
+	console.log(studentsList);
 
-    // res.render("editAttendance", { studentsList: studentsList, date: date, username: username });
-    res.json({
-        success: true,
-        studentsList: studentsList,
-    });
+	// res.render("editAttendance", { studentsList: studentsList, date: date, username: username });
+	res.json({
+		success: true,
+		studentsList: studentsList,
+	});
 
-    return;
+	return;
 });
 
 router.get("/attendance", async (req, res) => {
@@ -47,31 +46,31 @@ router.get("/attendance", async (req, res) => {
 		message: "defaultResponse",
 	};
 
-    const { course, date, attendanceList } = req.body;
-    const username = req.user.username;
+	const { course, date, attendanceList } = req.body;
+	const username = req.user.username;
 
 	if (!attendanceList || !course || !date) {
-        jsonResponse.message = "missingDetails";
-        jsonResponse.success = false;
-        res.json(jsonResponse);
+		jsonResponse.message = "missingDetails";
+		jsonResponse.success = false;
+		res.json(jsonResponse);
 
-        return;
-    }
-    
-    const teacherDetails = await Teacher.findOne({ username });
+		return;
+	}
 
-    if (teacherDetails.courses.indexOf(course) === -1) {
-        jsonResponse.message = "invalidCourse";
-        jsonResponse.success = false;
-        res.json(jsonResponse);
+	const teacherDetails = await Teacher.findOne({ username });
 
-        return;
-    }
+	if (teacherDetails.courses.indexOf(course) === -1) {
+		jsonResponse.message = "invalidCourse";
+		jsonResponse.success = false;
+		res.json(jsonResponse);
+
+		return;
+	}
 
 	const prevRecord = await Attendance.findOne({
 		$and: [{ course: course }, { date: date }],
-    });
-    
+	});
+
 	if (prevRecord) {
 		// This will upsert the changes with a warning, rather than an error
 		const currAttendance = await Attendance.update({ course, date }, req.body, {
@@ -83,10 +82,9 @@ router.get("/attendance", async (req, res) => {
 			json.success = true;
 			res.json(jsonResponse);
 		} else {
-            jsonResponse.message = "upsertFailed";
-            jsonResponse.success = false,
-            res.json(jsonResponse);
-        }
+			jsonResponse.message = "upsertFailed";
+			(jsonResponse.success = false), res.json(jsonResponse);
+		}
 
 		return;
 	}
@@ -95,15 +93,15 @@ router.get("/attendance", async (req, res) => {
 		date: date,
 		course: course,
 		attendance: attendanceList,
-    });
-    
-    await attendance.save();
+	});
 
-    jsonResponse.success = true;
-    jsonResponse.message = "attendanceUpdated";
-    res.json(jsonResponse);
+	await attendance.save();
 
-    return;
+	jsonResponse.success = true;
+	jsonResponse.message = "attendanceUpdated";
+	res.json(jsonResponse);
+
+	return;
 });
 
 module.exports = router;

@@ -23,8 +23,8 @@ router.get("/", async (req, res) => {
 
 router.get("/getCourses", async (req, res) => {
 	return res.json({
-        courses: req.user.courses,
-    });
+		courses: req.user.courses,
+	});
 });
 
 module.exports = router;

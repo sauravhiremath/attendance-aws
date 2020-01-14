@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/student.model");
 const Teacher = require("../models/teacher.model");
+const addAttendance = require("../tests/addAttendance");
+const addStudents = require("../tests/addStudents");
 
 const dotenv = require("dotenv");
 const router = express.Router();
@@ -35,6 +37,15 @@ router.post("/register", async (req, res) => {
 		duplicates: [],
 	};
 
+	const { name, username, email, password } = req.body;
+
+	if (!name || !username || !email || !password) {
+		jsonResponse.message = "missingDetails";
+		res.json(jsonResponse);
+
+		return;
+	}
+
 	let user;
 	if (req.body.domain === "student") {
 		user = new Student({
@@ -42,6 +53,7 @@ router.post("/register", async (req, res) => {
 			name: req.body.name,
 			email: req.body.email,
 			password: req.body.password,
+			registeredCourses: ["machine learning"],
 		});
 	} else if (req.body.domain === "teacher") {
 		user = new Teacher({
@@ -49,6 +61,7 @@ router.post("/register", async (req, res) => {
 			name: req.body.name,
 			email: req.body.email,
 			password: req.body.password,
+			courses: ["machine learning"],
 		});
 	} else {
 		jsonResponse.message = "noDomainDefined";
@@ -67,9 +80,6 @@ router.post("/register", async (req, res) => {
 		}
 		if (duplicate.username === user.username) {
 			jsonResponse.duplicates.push("Username");
-		}
-		if (duplicate.regNo === user.regNo) {
-			jsonResponse.duplicates.push("Registration Number");
 		}
 
 		res.json(jsonResponse);
@@ -110,10 +120,18 @@ router.post("/login", async (req, res) => {
 
 	if (domain === "teacher") {
 		client = await Teacher.findOne({ username });
-		jsonResponse.data = client.courses;
+		try {
+			jsonResponse.courses = client.courses;
+		} catch (error) {
+			jsonResponse.courses = ["web dev"];
+		}
 	} else if (domain === "student") {
 		client = await User.findOne({ username });
-		jsonResponse.data = client.registeredCourses || "";
+		try {
+			jsonResponse.courses = client.registeredCourses;
+		} catch (error) {
+			jsonResponse.courses = ["web dev"];
+		}
 	} else {
 		json.message = "noDomainDefined";
 		res.json(jsonResponse);
@@ -133,7 +151,7 @@ router.post("/login", async (req, res) => {
 		const payload = {
 			domain: domain,
 			username: username,
-			courses: jsonResponse.data,
+			courses: jsonResponse.courses,
 		};
 		const jwtCookie = await generateToken(res, payload);
 		if (!jwtCookie) {
@@ -166,7 +184,7 @@ const generateToken = (res, payload) => {
 	const jwtToken = jwt.sign(payload, process.env.JWT_SECRET, {
 		expiresIn: process.env.ENVIRONMENT === "dev" ? "1d" : "7d",
 	});
-	
+
 	return res.cookie("jwtToken", jwtToken, {
 		maxAge: 1000 * 60 * 15,
 		secure: false, // set to true if your using https
