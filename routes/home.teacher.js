@@ -27,20 +27,27 @@ router.get("/submit", async (req, res) => {
 		return;
 	}
 
-	const studentsList = await Student.find({ course });
+	const studentsList = await Student.find(
+		{ registeredCourses: { $in: course } },
+		{ username: 1, name: 1, email: 1, _id: 0 },
+	);
 
-	console.log(studentsList);
+	// console.log(studentsList);
+	console.log("reached ...........");
 
-	// res.render("editAttendance", { studentsList: studentsList, date: date, username: username });
-	res.json({
-		success: true,
+	return res.render("editAttendance", {
 		studentsList: studentsList,
+		date: date,
+		username: username,
+		course: course,
 	});
-
-	return;
 });
 
 router.get("/attendance", async (req, res) => {
+	res.render("editAttendance");
+});
+
+router.get("/attendance/submit", async (req, res) => {
 	const jsonResponse = {
 		success: false,
 		message: "defaultResponse",

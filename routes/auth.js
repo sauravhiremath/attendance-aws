@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/student.model");
 const Teacher = require("../models/teacher.model");
 const addAttendance = require("../tests/addAttendance");
+const addTeachers = require("../tests/addTeachers");
 const addStudents = require("../tests/addStudents");
 
 const dotenv = require("dotenv");

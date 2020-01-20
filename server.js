@@ -29,11 +29,15 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
-const connect = mongoose.connect(process.env.MONGO_URI, {
-	useCreateIndex: true,
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-});
+mongoose
+	.connect(process.env.MONGO_URI, {
+		useCreateIndex: true,
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.catch((error) => console.log(error));
+
+console.log("ATLAS connection successfull...");
 
 if (process.env.ENVIRONMENT === "dev") app.use(cors());
 

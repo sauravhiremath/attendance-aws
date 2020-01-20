@@ -3,7 +3,7 @@ $(document).ready(function() {
 		e.preventDefault();
 
 		$.ajax({
-			url: "/home/editAttendance",
+			url: "/home/editAttendance/submit",
 			type: "GET",
 			credentials: "include",
 			data: {
